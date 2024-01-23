@@ -30,6 +30,11 @@ export default function Login({
                 aria-label="username"
                 name="username"
                 required
+                minLength={3}
+                maxLength={20}
+                pattern="[a-zA-Z0-9]+"
+                title="Username can only contain letters and numbers"
+                autoComplete="on"
               />
             )}
             <input
@@ -38,6 +43,7 @@ export default function Login({
               aria-label="email"
               name="email"
               required
+              autoComplete="on"
             />
             <input
               type="password"
@@ -45,6 +51,9 @@ export default function Login({
               aria-label="password"
               name="password"
               required
+              minLength={signingUp ? 6 : undefined}
+              maxLength={signingUp ? 20 : undefined}
+              autoComplete="on"
             />
             <button>{prompt}</button>
           </form>
