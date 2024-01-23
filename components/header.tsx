@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Login from "./login";
 
 export default function Header() {
   const user = "username";
@@ -29,7 +30,7 @@ export default function Header() {
           </ul>
         </nav>
       ) : (
-        <button>Log In</button>
+        <Login />
       )}
     </header>
   );
