@@ -1,3 +1,18 @@
+import { createClient } from "@/supabase";
+import { cookies } from "next/headers";
+
+async function signUp(formData: FormData) {
+  "use server";
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  await createClient(cookies()).auth.signUp({
+    email,
+    password,
+  });
+}
+
 export default function Login() {
   const signingUp = true;
   const prompt = signingUp ? "Sign Up" : "Log In";
@@ -12,7 +27,7 @@ export default function Login() {
           <button>
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
-          <form>
+          <form action={signUp}>
             <input
               type="email"
               placeholder="Email"
