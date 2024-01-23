@@ -6,12 +6,13 @@ export default function Login({
   signUp,
   logIn,
 }: {
-  signUp: (formData: FormData) => Promise<void>;
-  logIn: (formData: FormData) => Promise<void>;
+  signUp: (formData: FormData) => Promise<undefined | string>;
+  logIn: (formData: FormData) => Promise<undefined | string>;
 }) {
   const [signingUp, setSigningUp] = useState(false);
   const prompt = signingUp ? "Sign Up" : "Log In";
   const [login, setLogin] = useState(true);
+  const [error, setError] = useState("");
 
   return (
     <>
@@ -19,10 +20,22 @@ export default function Login({
       {login && (
         <section>
           <h3>{prompt}</h3>
-          <button onClick={() => setSigningUp(!signingUp)}>
+          <button
+            onClick={() => {
+              setError("");
+              setSigningUp(!signingUp);
+            }}
+          >
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
-          <form action={signingUp ? signUp : logIn}>
+          <form
+            action={async (formData) => {
+              const error = signingUp
+                ? await signUp(formData)
+                : await logIn(formData);
+              error ? setError(error) : setError("");
+            }}
+          >
             {signingUp && (
               <input
                 type="text"
@@ -45,6 +58,7 @@ export default function Login({
               required
               autoComplete="on"
             />
+            {error === "Email already registered" && <p>{error}</p>}
             <input
               type="password"
               placeholder="Password"
@@ -55,6 +69,7 @@ export default function Login({
               maxLength={signingUp ? 20 : undefined}
               autoComplete="on"
             />
+            {error === "Invalid credentials" && <p>{error}</p>}
             <button>{prompt}</button>
           </form>
         </section>

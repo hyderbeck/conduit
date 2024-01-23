@@ -14,16 +14,22 @@ async function signUp(formData: FormData) {
 
   const {
     data: { user },
+    error,
   } = await supabase.auth.signUp({
     email,
     password,
   });
 
-  await supabase.schema("conduit").from("profiles").insert({
-    username,
-    email,
-    user_id: user!.id,
-  });
+  if (!error) {
+    await supabase.schema("conduit").from("profiles").insert({
+      username,
+      email,
+      user_id: user!.id,
+    });
+  }
+
+  if (error && error.message === "User already registered")
+    return "Email already registered";
 }
 
 async function logIn(formData: FormData) {
@@ -32,14 +38,17 @@ async function logIn(formData: FormData) {
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  await createClient(cookies()).auth.signInWithPassword({
+  const { error } = await createClient(cookies()).auth.signInWithPassword({
     email,
     password,
   });
+
+  if (error && error.message === "Invalid login credentials")
+    return "Invalid credentials";
 }
 
 export default function Header() {
-  const user = "username";
+  const user = false;
   const userMenu = true;
 
   return (
