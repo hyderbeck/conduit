@@ -1,42 +1,25 @@
-import { createClient } from "@/supabase";
-import { cookies } from "next/headers";
+"use client";
 
-async function signUp(formData: FormData) {
-  "use server";
+import { useState } from "react";
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  await createClient(cookies()).auth.signUp({
-    email,
-    password,
-  });
-}
-
-async function logIn(formData: FormData) {
-  "use server";
-
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  await createClient(cookies()).auth.signInWithPassword({
-    email,
-    password,
-  });
-}
-
-export default function Login() {
-  const signingUp = false;
+export default function Login({
+  signUp,
+  logIn,
+}: {
+  signUp: (formData: FormData) => Promise<void>;
+  logIn: (formData: FormData) => Promise<void>;
+}) {
+  const [signingUp, setSigningUp] = useState(false);
   const prompt = signingUp ? "Sign Up" : "Log In";
-  const login = true;
+  const [login, setLogin] = useState(true);
 
   return (
     <>
-      <button>Log In</button>
+      <button onClick={() => setLogin(!login)}>Log In</button>
       {login && (
         <section>
           <h3>{prompt}</h3>
-          <button>
+          <button onClick={() => setSigningUp(!signingUp)}>
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
           <form action={signingUp ? signUp : logIn}>

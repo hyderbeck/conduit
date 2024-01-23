@@ -1,5 +1,31 @@
 import Link from "next/link";
 import Login from "./login";
+import { createClient } from "@/supabase";
+import { cookies } from "next/headers";
+
+async function signUp(formData: FormData) {
+  "use server";
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  await createClient(cookies()).auth.signUp({
+    email,
+    password,
+  });
+}
+
+async function logIn(formData: FormData) {
+  "use server";
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  await createClient(cookies()).auth.signInWithPassword({
+    email,
+    password,
+  });
+}
 
 export default function Header() {
   const user = "username";
@@ -30,7 +56,7 @@ export default function Header() {
           </ul>
         </nav>
       ) : (
-        <Login />
+        <Login signUp={signUp} logIn={logIn} />
       )}
     </header>
   );
