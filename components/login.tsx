@@ -13,8 +13,20 @@ async function signUp(formData: FormData) {
   });
 }
 
+async function logIn(formData: FormData) {
+  "use server";
+
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+
+  await createClient(cookies()).auth.signInWithPassword({
+    email,
+    password,
+  });
+}
+
 export default function Login() {
-  const signingUp = true;
+  const signingUp = false;
   const prompt = signingUp ? "Sign Up" : "Log In";
   const login = true;
 
@@ -27,7 +39,7 @@ export default function Login() {
           <button>
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
-          <form action={signUp}>
+          <form action={signingUp ? signUp : logIn}>
             <input
               type="email"
               placeholder="Email"
