@@ -1,7 +1,7 @@
 export default function Page() {
   return (
     <main>
-      <h1>Conduit</h1>
+      <h2>Conduit</h2>
     </main>
   );
 }
