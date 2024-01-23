@@ -23,6 +23,15 @@ export default function Login({
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
           <form action={signingUp ? signUp : logIn}>
+            {signingUp && (
+              <input
+                type="text"
+                placeholder="Username"
+                aria-label="username"
+                name="username"
+                required
+              />
+            )}
             <input
               type="email"
               placeholder="Email"

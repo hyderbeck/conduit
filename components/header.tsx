@@ -8,10 +8,21 @@ async function signUp(formData: FormData) {
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
+  const username = formData.get("username") as string;
 
-  await createClient(cookies()).auth.signUp({
+  const supabase = createClient(cookies());
+
+  const {
+    data: { user },
+  } = await supabase.auth.signUp({
     email,
     password,
+  });
+
+  await supabase.schema("conduit").from("profiles").insert({
+    username,
+    email,
+    user_id: user!.id,
   });
 }
 
