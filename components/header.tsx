@@ -3,6 +3,7 @@ import Login from "./login";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { z } from "zod";
+import { revalidatePath } from "next/cache";
 
 async function signUp(formData: FormData) {
   "use server";
@@ -51,6 +52,8 @@ async function signUp(formData: FormData) {
       email,
       user_id: user!.id,
     });
+    revalidatePath("/", "layout");
+    return "signed up";
   }
 
   if (error && error.message === "User already registered")
@@ -67,6 +70,11 @@ async function logIn(formData: FormData) {
     email,
     password,
   });
+
+  if (!error) {
+    revalidatePath("/", "layout");
+    return "logged in";
+  }
 
   if (error && error.message === "Invalid login credentials")
     return "Invalid credentials";

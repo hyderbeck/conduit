@@ -1,5 +1,6 @@
 "use client";
 
+import { usePathname, useRouter } from "next/navigation";
 import { useState } from "react";
 
 export default function Login({
@@ -13,6 +14,8 @@ export default function Login({
   const prompt = signingUp ? "Sign Up" : "Log In";
   const [login, setLogin] = useState(true);
   const [error, setError] = useState("");
+  const router = useRouter();
+  const pathname = usePathname();
 
   return (
     <>
@@ -29,11 +32,20 @@ export default function Login({
             {signingUp ? "Already have an account?" : "Need an account?"}
           </button>
           <form
+            onSubmit={() => {
+              setError("");
+            }}
             action={async (formData) => {
               const error = signingUp
                 ? await signUp(formData)
                 : await logIn(formData);
-              error ? setError(error) : setError("");
+              if (error === "signed up") {
+                router.push(`/${formData.get("username")}`);
+              } else if (error === "logged in") {
+                router.replace(pathname);
+              } else {
+                error && setError(error);
+              }
             }}
           >
             {signingUp && (
