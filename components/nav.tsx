@@ -1,9 +1,19 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
 
-export default function Nav({ username }: { username: string }) {
+export default function Nav({
+  username,
+  logOut,
+}: {
+  username: string;
+  logOut: () => Promise<void>;
+}) {
   const userMenu = true;
+  const pathname = usePathname();
+  const router = useRouter();
+
   return (
     <nav>
       <ul>
@@ -18,7 +28,14 @@ export default function Nav({ username }: { username: string }) {
                 <Link href={`/${username}`}>Profile</Link>
               </li>
               <li>
-                <button>Log Out</button>
+                <button
+                  onClick={async () => {
+                    await logOut();
+                    router.replace(pathname);
+                  }}
+                >
+                  Log Out
+                </button>
               </li>
             </ul>
           )}

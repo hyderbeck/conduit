@@ -81,6 +81,13 @@ async function logIn(formData: FormData) {
     return "Invalid credentials";
 }
 
+async function logOut() {
+  "use server";
+
+  await createClient(cookies()).auth.signOut();
+  revalidatePath("/", "layout");
+}
+
 export default function Header() {
   const user = "username";
 
@@ -89,7 +96,11 @@ export default function Header() {
       <h1>
         <Link href="/">Conduit</Link>
       </h1>
-      {user ? <Nav username={user} /> : <Login signUp={signUp} logIn={logIn} />}
+      {user ? (
+        <Nav username={user} logOut={logOut} />
+      ) : (
+        <Login signUp={signUp} logIn={logIn} />
+      )}
     </header>
   );
 }
