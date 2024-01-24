@@ -4,6 +4,7 @@ import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import Nav from "./nav";
 
 async function signUp(formData: FormData) {
   "use server";
@@ -81,36 +82,14 @@ async function logIn(formData: FormData) {
 }
 
 export default function Header() {
-  const user = false;
-  const userMenu = true;
+  const user = "username";
 
   return (
     <header>
-      <h1>Conduit</h1>
-      {user ? (
-        <nav>
-          <ul>
-            <li>
-              <Link href="/new">New Article</Link>
-            </li>
-            <li>
-              <button>{user}</button>
-              {userMenu && (
-                <ul>
-                  <li>
-                    <Link href={`/${user}`}>Profile</Link>
-                  </li>
-                  <li>
-                    <button>Log Out</button>
-                  </li>
-                </ul>
-              )}
-            </li>
-          </ul>
-        </nav>
-      ) : (
-        <Login signUp={signUp} logIn={logIn} />
-      )}
+      <h1>
+        <Link href="/">Conduit</Link>
+      </h1>
+      {user ? <Nav username={user} /> : <Login signUp={signUp} logIn={logIn} />}
     </header>
   );
 }
