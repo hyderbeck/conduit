@@ -2,15 +2,40 @@ import Link from "next/link";
 import Login from "./login";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
+import { z } from "zod";
 
 async function signUp(formData: FormData) {
   "use server";
+
+  const supabase = createClient(cookies());
+
+  const User = z.object({
+    email: z.string().email(),
+    password: z.string().min(6),
+    username: z
+      .string()
+      .min(3)
+      .max(20)
+      .regex(/^[a-zA-Z0-9]+$/),
+  });
 
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
   const username = formData.get("username") as string;
 
-  const supabase = createClient(cookies());
+  if (!User.safeParse({ email, password, username }).success) return;
+
+  if (
+    (
+      await supabase
+        .schema("conduit")
+        .from("profiles")
+        .select()
+        .eq("username", username)
+        .single()
+    ).data
+  )
+    return "Username already taken";
 
   const {
     data: { user },

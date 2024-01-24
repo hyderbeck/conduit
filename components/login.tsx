@@ -50,6 +50,7 @@ export default function Login({
                 autoComplete="on"
               />
             )}
+            {error === "Username already taken" && <p>{error}</p>}
             <input
               type="email"
               placeholder="Email"
