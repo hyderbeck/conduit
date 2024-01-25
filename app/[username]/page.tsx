@@ -1,3 +1,4 @@
+import { FollowButton } from "@/components/buttons";
 import Feed from "@/components/feed";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
@@ -8,8 +9,10 @@ export default async function Page({
 }: {
   params: { username: string };
 }) {
+  const supabase = createClient(cookies());
+
   const profile = (
-    await createClient(cookies())
+    await supabase
       .schema("conduit")
       .from("profiles")
       .select()
@@ -21,11 +24,15 @@ export default async function Page({
     notFound();
   }
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   return (
     <main>
       <h2>{profile.username}</h2>
       {profile.bio && <p>{profile.bio}</p>}
-      <button>Follow</button>
+      <FollowButton followingId={profile.user_id} followerId={user?.id} />
       <ul>
         <li>
           <h3>Feed</h3>

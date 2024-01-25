@@ -125,7 +125,34 @@ export interface Database {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      favorites_append: {
+        Args: {
+          article_id: number;
+          id: string;
+        };
+        Returns: undefined;
+      };
+      following_append: {
+        Args: {
+          following_id: string;
+          follower_id: string;
+        };
+        Returns: undefined;
+      };
+      following_remove: {
+        Args: {
+          following_id: string;
+          follower_id: string;
+        };
+        Returns: undefined;
+      };
+      favorites_remove: {
+        Args: {
+          article_id: number;
+          id: string;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;
