@@ -9,7 +9,17 @@ export default function Page() {
             <h3>Feed</h3>
           </li>
         </ul>
-        <article>article</article>
+        <article>
+          <address>author</address>
+          <time>date</time>
+          <button>Like</button>
+          <h4>title</h4>
+          <p>body</p>
+          <p>Read more...</p>
+          <ul>
+            <li>tag</li>
+          </ul>
+        </article>
       </section>
       <nav aria-label="pagination">
         <ul>
