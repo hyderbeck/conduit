@@ -34,7 +34,9 @@ export default async function Page({
       <Link href={`/${params.username}`}>
         <address>{params.username}</address>
       </Link>
-      <FollowButton followingId={article.author_id} followerId={user?.id} />
+      {!(user?.id === article.author_id) && (
+        <FollowButton followingId={article.author_id} followerId={user?.id} />
+      )}
       <LikeButton articleId={article.id} userId={user?.id} />
       <p>{article.body}</p>
       {article.tag_list && (

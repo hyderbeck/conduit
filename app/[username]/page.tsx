@@ -28,11 +28,15 @@ export default async function Page({
     data: { user },
   } = await supabase.auth.getUser();
 
+  const isUser = user?.id === profile.user_id;
+
   return (
     <main>
       <h2>{profile.username}</h2>
       {profile.bio && <p>{profile.bio}</p>}
-      <FollowButton followingId={profile.user_id} followerId={user?.id} />
+      {!isUser && (
+        <FollowButton followingId={profile.user_id} followerId={user?.id} />
+      )}
       <ul>
         <li>
           <h3>Feed</h3>
