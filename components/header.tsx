@@ -88,16 +88,30 @@ async function logOut() {
   revalidatePath("/", "layout");
 }
 
-export default function Header() {
-  const user = "username";
+export default async function Header() {
+  const supabase = createClient(cookies());
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const username = user
+    ? (
+        await supabase
+          .schema("conduit")
+          .from("profiles")
+          .select()
+          .eq("user_id", user.id)
+          .single()
+      ).data!.username
+    : undefined;
 
   return (
     <header>
       <h1>
         <Link href="/">Conduit</Link>
       </h1>
-      {user ? (
-        <Nav username={user} logOut={logOut} />
+      {username ? (
+        <Nav username={username} logOut={logOut} />
       ) : (
         <Login signUp={signUp} logIn={logIn} />
       )}
