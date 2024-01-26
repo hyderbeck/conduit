@@ -3,6 +3,7 @@ import Feed from "@/components/feed";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
+import Avatar from "@/components/avatar";
 
 export default async function Page({
   params,
@@ -32,6 +33,7 @@ export default async function Page({
 
   return (
     <main>
+      <Avatar username={profile.username} width={200} />
       <h2>{profile.username}</h2>
       {profile.bio && <p>{profile.bio}</p>}
       {!isUser && (

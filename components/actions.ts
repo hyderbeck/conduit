@@ -61,3 +61,9 @@ export async function unlike(article_id: number, id: string) {
   });
   revalidatePath("/", "layout");
 }
+
+export async function hasAvatar(username: string) {
+  return (
+    await createClient(cookies()).storage.from("avatars").list()
+  ).data!.some((file) => file.name === `${username}.jpg`);
+}

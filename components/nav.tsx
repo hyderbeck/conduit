@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import Avatar from "./avatar";
 
 export default function Nav({
   username,
@@ -21,6 +22,7 @@ export default function Nav({
           <Link href="/new">New Article</Link>
         </li>
         <li>
+          <Avatar username={username} width={48} priority />
           <button>{username}</button>
           {userMenu && (
             <ul>

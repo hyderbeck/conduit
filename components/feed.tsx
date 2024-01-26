@@ -3,6 +3,7 @@ import { cookies } from "next/headers";
 import { Tables } from "@/types";
 import Link from "next/link";
 import { LikeButton } from "./buttons";
+import Avatar from "./avatar";
 
 function Article({
   article,
@@ -15,6 +16,7 @@ function Article({
 }) {
   return (
     <article>
+      <Avatar username={author} width={48} />
       <Link href={`/${author}`}>
         <address>{author}</address>
       </Link>
