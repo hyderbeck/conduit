@@ -1,6 +1,7 @@
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import Preview from "./preview";
+import Pagination from "./pagination";
 
 async function getHomeFeed(
   supabase: ReturnType<typeof createClient>,
@@ -70,6 +71,7 @@ export default async function Feed({
   searchParams?: {
     tab?: string;
     tag?: string;
+    page?: number;
   };
   username?: string;
 }) {
@@ -78,6 +80,16 @@ export default async function Feed({
   let articles = username
     ? await getProfileFeed(supabase, username)
     : await getHomeFeed(supabase, userId, searchParams?.tab, searchParams?.tag);
+
+  const pagesTotal = Math.ceil((articles?.length || 1) / 10);
+
+  if (articles?.length) {
+    const start =
+      searchParams?.page && searchParams?.page > 1
+        ? searchParams?.page * 10
+        : 0;
+    articles = articles.slice(start, start + 10);
+  }
 
   return (
     <section>
@@ -99,11 +111,7 @@ export default async function Feed({
             userId={userId}
           />
         ))}
-      <nav aria-label="pagination">
-        <ul>
-          <li>1</li>
-        </ul>
-      </nav>
+      <Pagination pagesTotal={pagesTotal} />
     </section>
   );
 }
