@@ -1,7 +1,7 @@
 "use client";
 
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function Login({
   signUp,
@@ -12,10 +12,16 @@ export default function Login({
 }) {
   const [signingUp, setSigningUp] = useState(false);
   const prompt = signingUp ? "Sign Up" : "Log In";
-  const [login, setLogin] = useState(true);
   const [error, setError] = useState("");
   const router = useRouter();
   const pathname = usePathname();
+
+  const searchParams = useSearchParams();
+  const [login, setLogin] = useState(searchParams.has("login"));
+
+  useEffect(() => {
+    setLogin(searchParams.has("login"));
+  }, [searchParams]);
 
   return (
     <>
