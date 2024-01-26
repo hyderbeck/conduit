@@ -3,6 +3,24 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
+export function InputUsername({ username }: { username?: string }) {
+  return (
+    <input
+      type="text"
+      placeholder="Username"
+      aria-label="username"
+      name="username"
+      required
+      minLength={3}
+      maxLength={20}
+      pattern="[a-zA-Z0-9]+"
+      title="Username can only contain letters and numbers"
+      autoComplete="on"
+      defaultValue={username}
+    />
+  );
+}
+
 export default function Login({
   signUp,
   logIn,
@@ -54,21 +72,7 @@ export default function Login({
               }
             }}
           >
-            {signingUp && (
-              <input
-                type="text"
-                placeholder="Username"
-                aria-label="username"
-                name="username"
-                required
-                minLength={3}
-                maxLength={20}
-                pattern="[a-zA-Z0-9]+"
-                title="Username can only contain letters and numbers"
-                autoComplete="on"
-              />
-            )}
-            {error === "Username already taken" && <p>{error}</p>}
+            {signingUp && <InputUsername />}
             <input
               type="email"
               placeholder="Email"
