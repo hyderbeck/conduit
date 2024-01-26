@@ -1,57 +1,88 @@
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
-import { Tables } from "@/types";
-import Link from "next/link";
-import { LikeButton } from "./buttons";
-import Avatar from "./avatar";
+import Preview from "./preview";
 
-function Article({
-  article,
-  author,
-  userId,
-}: {
-  article: Tables<"articles">;
-  author: string;
-  userId?: string;
-}) {
-  return (
-    <article>
-      <Avatar username={author} width={48} />
-      <Link href={`/${author}`}>
-        <address>{author}</address>
-      </Link>
-      <time>{article.created_at}</time>
-      <LikeButton articleId={article.id} userId={userId} />
-      <h4>{article.title}</h4>
-      <p>{article.body}</p>
-      <p>
-        <Link href={`/${author}/${article.slug}`}>Read more...</Link>
-      </p>
-      {article.tag_list && (
-        <ul>
-          {article.tag_list?.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      )}
-    </article>
-  );
+async function getHomeFeed(
+  supabase: ReturnType<typeof createClient>,
+  userId?: string,
+  tab?: string,
+  tag?: string
+) {
+  if (tag)
+    return (
+      await supabase
+        .schema("conduit")
+        .from("articles")
+        .select()
+        .contains("tag_list", [tag])
+    ).data;
+
+  return userId && tab === "following"
+    ? (
+        await supabase
+          .schema("conduit")
+          .from("articles")
+          .select()
+          .in(
+            "author_id",
+            (
+              await supabase
+                .schema("conduit")
+                .from("profiles")
+                .select()
+                .eq("user_id", userId)
+                .single()
+            ).data!.following || []
+          )
+      ).data
+    : (await supabase.schema("conduit").from("articles").select()).data;
 }
 
-export default async function Feed() {
-  const supabase = createClient(cookies());
-  const articles = (await supabase.schema("conduit").from("articles").select())
-    .data;
+async function getProfileFeed(
+  supabase: ReturnType<typeof createClient>,
+  username: string
+) {
+  return (
+    await supabase
+      .schema("conduit")
+      .from("articles")
+      .select()
+      .eq(
+        "author_id",
+        (
+          await supabase
+            .schema("conduit")
+            .from("profiles")
+            .select()
+            .eq("username", username)
+            .single()
+        ).data!.user_id
+      )
+  ).data;
+}
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default async function Feed({
+  userId,
+  searchParams,
+  username,
+}: {
+  userId?: string;
+  searchParams?: {
+    tab?: string;
+  };
+  username?: string;
+}) {
+  const supabase = createClient(cookies());
+
+  let articles = username
+    ? await getProfileFeed(supabase, username!)
+    : await getHomeFeed(supabase, userId, searchParams?.tab);
 
   return (
     <section>
       {articles?.length &&
         articles?.map(async (article) => (
-          <Article
+          <Preview
             key={article.id}
             article={article}
             author={
@@ -64,7 +95,7 @@ export default async function Feed() {
                   .single()
               ).data!.username
             }
-            userId={user?.id}
+            userId={userId}
           />
         ))}
       <nav aria-label="pagination">

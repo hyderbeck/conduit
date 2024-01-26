@@ -4,6 +4,7 @@ import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Avatar from "@/components/avatar";
+import Tabs from "@/components/tabs";
 
 export default async function Page({
   params,
@@ -39,12 +40,8 @@ export default async function Page({
       {!isUser && (
         <FollowButton followingId={profile.user_id} followerId={user?.id} />
       )}
-      <ul>
-        <li>
-          <h3>Feed</h3>
-        </li>
-      </ul>
-      <Feed />
+      <Tabs tabs={["Feed"]} username={profile.username} />
+      <Feed userId={user?.id} username={profile.username} />
     </main>
   );
 }
