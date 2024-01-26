@@ -2,6 +2,7 @@ import { Tables } from "@/types";
 import Avatar from "./avatar";
 import Link from "next/link";
 import { LikeButton } from "./buttons";
+import Tags from "./tags";
 
 export default function Preview({
   article,
@@ -25,13 +26,7 @@ export default function Preview({
       <p>
         <Link href={`/${author}/${article.slug}`}>Read more...</Link>
       </p>
-      {article.tag_list?.length && (
-        <ul>
-          {article.tag_list.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      )}
+      {article.tag_list?.length && <Tags tags={article.tag_list} />}
     </article>
   );
 }

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LikeButton } from "@/components/buttons";
 import Avatar from "@/components/avatar";
+import Tags from "@/components/tags";
 
 export default async function Page({
   params,
@@ -38,13 +39,7 @@ export default async function Page({
       </Link>
       <LikeButton articleId={article.id} userId={user?.id} />
       <p>{article.body}</p>
-      {article.tag_list?.length && (
-        <ul>
-          {article.tag_list?.map((tag) => (
-            <li key={tag}>{tag}</li>
-          ))}
-        </ul>
-      )}
+      {article.tag_list?.length && <Tags tags={article.tag_list} />}
     </main>
   );
 }

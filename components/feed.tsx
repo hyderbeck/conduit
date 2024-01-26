@@ -69,14 +69,15 @@ export default async function Feed({
   userId?: string;
   searchParams?: {
     tab?: string;
+    tag?: string;
   };
   username?: string;
 }) {
   const supabase = createClient(cookies());
 
   let articles = username
-    ? await getProfileFeed(supabase, username!)
-    : await getHomeFeed(supabase, userId, searchParams?.tab);
+    ? await getProfileFeed(supabase, username)
+    : await getHomeFeed(supabase, userId, searchParams?.tab, searchParams?.tag);
 
   return (
     <section>
