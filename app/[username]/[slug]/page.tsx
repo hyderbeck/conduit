@@ -2,6 +2,7 @@ import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Article from "./article";
+import { updateArticle } from "@/app/actions";
 
 export default async function Page({
   params,
@@ -28,6 +29,11 @@ export default async function Page({
   } = await supabase.auth.getUser();
 
   return (
-    <Article article={article} username={params.username} userId={user?.id} />
+    <Article
+      article={article}
+      username={params.username}
+      userId={user?.id}
+      updateArticle={updateArticle}
+    />
   );
 }
