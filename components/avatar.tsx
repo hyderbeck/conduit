@@ -6,10 +6,12 @@ export default function Avatar({
   username,
   width,
   priority,
+  src,
 }: {
   username: string;
   width: number;
   priority?: boolean;
+  src?: string;
 }) {
   const url = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/avatars/${username}.jpg`;
   const [avatar, setAvatar] = useState(false);
@@ -24,7 +26,7 @@ export default function Avatar({
 
   return (
     <Image
-      src={avatar ? url : "/avatar.svg"}
+      src={src || (avatar ? url : "/avatar.svg")}
       alt={username}
       width={width}
       height={width}

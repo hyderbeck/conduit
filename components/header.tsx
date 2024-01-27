@@ -6,6 +6,20 @@ import { z } from "zod";
 import { revalidatePath } from "next/cache";
 import Nav from "./nav";
 
+export async function usernameExists(
+  supabase: ReturnType<typeof createClient>,
+  username: string
+) {
+  return (
+    await supabase
+      .schema("conduit")
+      .from("profiles")
+      .select()
+      .eq("username", username)
+      .single()
+  ).data;
+}
+
 async function signUp(formData: FormData) {
   "use server";
 
@@ -27,17 +41,7 @@ async function signUp(formData: FormData) {
 
   if (!User.safeParse({ email, password, username }).success) return;
 
-  if (
-    (
-      await supabase
-        .schema("conduit")
-        .from("profiles")
-        .select()
-        .eq("username", username)
-        .single()
-    ).data
-  )
-    return "Username already taken";
+  if (await usernameExists(supabase, username)) return "Username already taken";
 
   const {
     data: { user },
