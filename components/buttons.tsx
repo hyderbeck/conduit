@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import {
   follow,
   like,
@@ -10,6 +9,37 @@ import {
   isFavorite,
 } from "./actions";
 import { usePathname, useRouter } from "next/navigation";
+import { HeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
+import { useEffect, useState } from "react";
+
+export function Button({
+  onClick,
+  text,
+  type,
+  className,
+  children,
+  disabled,
+}: {
+  onClick?: () => void | Promise<void>;
+  text?: string;
+  type?: "button";
+  className?: string;
+  children?: React.ReactNode;
+  disabled?: boolean;
+}) {
+  return (
+    <button
+      onClick={() => onClick && onClick()}
+      className={`flex gap-x-2 items-center justify-center min-w-20 text-emerald-300 border border-emerald-300 rounded px-2 py-1 active:shadow-inner active:shadow-stone-200 bg-stone-50 ${className}`}
+      type={type ? type : "submit"}
+      disabled={disabled}
+    >
+      {children}
+      {text}
+    </button>
+  );
+}
 
 export function FollowButton({
   followingId,
@@ -21,14 +51,14 @@ export function FollowButton({
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const [following, setFollowing] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
     const checkFollowing = async () => {
       if (!followerId) {
-        setFollowing(false);
+        setActive(false);
       } else {
-        setFollowing(await isFollowing(followingId, followerId));
+        setActive((await isFollowing(followingId, followerId)) || false);
       }
     };
 
@@ -36,23 +66,28 @@ export function FollowButton({
   }, [followingId, followerId]);
 
   return (
-    <button
+    <Button
+      type="button"
       onClick={async () => {
         if (!followerId) {
           replace(`${pathname}?login=true`);
         } else {
-          if (following) {
-            setFollowing(false);
+          if (active) {
+            setActive(false);
             await unfollow(followingId, followerId);
           } else {
-            setFollowing(true);
+            setActive(true);
             await follow(followingId, followerId);
           }
         }
       }}
-    >
-      Follow
-    </button>
+      className={
+        active
+          ? "border-stone-950 text-stone-950 shadow-inner shadow-stone-200"
+          : "border-stone-950 text-stone-950"
+      }
+      text={active ? "Following" : "Follow"}
+    />
   );
 }
 
@@ -66,35 +101,41 @@ export function LikeButton({
   const pathname = usePathname();
   const { replace } = useRouter();
 
-  const [favorite, setFavorite] = useState(false);
+  const [active, setActive] = useState(false);
 
   useEffect(() => {
     const checkFavorite = async () => {
       if (!userId) {
-        setFavorite(false);
-      } else setFavorite(await isFavorite(articleId, userId));
+        setActive(false);
+      } else setActive((await isFavorite(articleId, userId)) || false);
     };
 
     checkFavorite();
   }, [articleId, userId]);
 
   return (
-    <button
+    <Button
+      type="button"
       onClick={async () => {
         if (!userId) {
           replace(`${pathname}?login=true`);
         } else {
-          if (favorite) {
-            setFavorite(false);
+          if (active) {
+            setActive(false);
             await unlike(articleId, userId);
           } else {
-            setFavorite(true);
+            setActive(true);
             await like(articleId, userId);
           }
         }
       }}
+      className={`text-red-500 bg-transparent border-none active:shadow-none !min-w-0 !w-fit !p-0`}
     >
-      Like
-    </button>
+      {active ? (
+        <HeartIconSolid className="w-5 h-5" />
+      ) : (
+        <HeartIcon className="w-5 h-5" />
+      )}
+    </Button>
   );
 }
