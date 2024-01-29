@@ -1,11 +1,12 @@
 "use client";
 
 import Avatar from "@/components/avatar";
-import { FollowButton } from "@/components/buttons";
+import { Button, FollowButton } from "@/components/buttons";
 import { InputUsername } from "@/components/login";
 import { Tables } from "@/types";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import Spinner from "@/components/spinner";
 
 export default function Profile({
   profile,
@@ -53,16 +54,27 @@ export default function Profile({
           setLoading(false);
         }
       }}
+      className="min-h-80 bg-emerald-300 bg-hero flex items-center"
     >
-      <div>
-        <div>
-          <div>
+      <div className="flex-1 flex p-6 gap-x-8 justify-between items-start max-w-screen-lg mx-auto min-w-0">
+        <div className="flex flex-col sm:flex-row gap-4 min-w-[200px]">
+          <div className="flex flex-col gap-y-2 min-w-[200px] min-h-[200px]">
             <Avatar
               src={avatar && avatar}
               username={profile.username}
               width={200}
+              onClick={() =>
+                isEditing && avatarRef.current && avatarRef.current.click()
+              }
+              error={error}
+              isEditing={isEditing}
+              isUser={isUser}
             />
-            {error === "Avatar should be less than 5 MB" && <p>{error}</p>}
+            {error === "Avatar should be less than 5 MB" && (
+              <p className="text-red-500 text-sm px-2 border border-red-500 rounded bg-white w-fit text-center">
+                {error}
+              </p>
+            )}
             <input
               type="file"
               aria-label="avatar"
@@ -82,14 +94,22 @@ export default function Profile({
               className="hidden"
             />
           </div>
-          <div>
+          <div className="flex flex-col gap-y-2 min-w-0">
             {isEditing ? (
               <>
-                <InputUsername username={profile.username} />
-                {error === "Username already taken" && <p>{error}</p>}
+                <InputUsername
+                  username={profile.username}
+                  error={error}
+                  className="w-full max-w-[20ch]"
+                />
+                {error === "Username already taken" && (
+                  <p className="text-red-500 text-sm px-2 border border-red-500 rounded bg-white w-fit text-center">
+                    {error}
+                  </p>
+                )}
               </>
             ) : (
-              <h2>
+              <h2 className="text-xl font-bold text-stone-50 bg-stone-950 px-1 w-fit">
                 <i>@</i>
                 {profile.username}
               </h2>
@@ -103,27 +123,44 @@ export default function Profile({
                 cols={40}
                 maxLength={160}
                 defaultValue={bio || undefined}
+                spellCheck={false}
+                className={`border border-stone-100 rounded placeholder:text-stone-400 px-4 py-2 max-w-sm w-[calc(100vw-48px)] sm:w-full resize-none`}
               />
             ) : (
-              bio && <p>{bio}</p>
+              bio && (
+                <p
+                  className={`rounded bg-white px-4 py-2 text-stone-700 max-w-sm w-[calc(100vw-48px)] sm:w-full break-words whitespace-pre-line`}
+                >
+                  {bio}
+                </p>
+              )
             )}
           </div>
         </div>
         {isEditing ? (
-          <div>
-            <button disabled={loading}>{loading ? "Saving..." : "Save"}</button>
-            <button
+          <div className="flex flex-col gap-y-2">
+            <Button
+              text={loading ? "Saving..." : "Save"}
+              disabled={loading}
+              className="border-stone-950 text-stone-950"
+            >
+              {loading && <Spinner />}
+            </Button>
+            <Button
               type="button"
               onClick={() => setIsEditing(false)}
+              text="Cancel"
               disabled={loading}
-            >
-              Cancel
-            </button>
+              className="border-stone-950 text-stone-950"
+            />
           </div>
         ) : isUser ? (
-          <button type="button" onClick={() => setIsEditing(true)}>
-            Edit
-          </button>
+          <Button
+            type="button"
+            onClick={() => setIsEditing(true)}
+            text="Edit"
+            className="border-stone-950 text-stone-950"
+          />
         ) : (
           <FollowButton followingId={profile.user_id} followerId={userId} />
         )}
