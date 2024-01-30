@@ -47,7 +47,7 @@ export default function Preview({
         >
           Read more...
         </Link>
-        {article.tag_list && <Tags tags={article.tag_list} />}
+        {article.tag_list?.length && <Tags tags={article.tag_list} />}
       </div>
     </article>
   );

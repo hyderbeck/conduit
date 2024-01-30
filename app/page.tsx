@@ -1,6 +1,8 @@
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import Tags from "@/components/tags";
+import { Suspense } from "react";
+import LoadingScreen from "@/components/loading-screen";
 import Tabs from "@/components/tabs";
 import Feed from "@/components/feed";
 import Image from "next/image";
@@ -29,7 +31,7 @@ export default async function Page({
   for (const article of (
     await supabase.schema("conduit").from("articles").select()
   ).data!) {
-    if (article.tag_list)
+    if (article.tag_list?.length)
       for (const tag of article.tag_list) {
         if (!tags.find((t) => t.tag === tag)) {
           tags.push({ tag, counter: 1 });
@@ -80,7 +82,12 @@ export default async function Page({
       <div className="flex flex-col gap-8 sm:flex-row max-w-screen-lg mx-auto my-8">
         <section className="flex-1 mx-6 flex flex-col">
           <Tabs tabs={tabs} />
-          <Feed searchParams={searchParams} />
+          <Suspense
+            key={searchParams?.page || searchParams?.tab || searchParams?.tag}
+            fallback={<LoadingScreen />}
+          >
+            <Feed searchParams={searchParams} />
+          </Suspense>
         </section>
         <section className="bg-stone-100 px-6 py-4 flex flex-col gap-4 h-fit sm:p-4 sm:mr-6 sm:rounded sm:max-w-48">
           <h3 className="font-bold">Popular Tags</h3>

@@ -4,6 +4,8 @@ import { notFound } from "next/navigation";
 import Profile from "./profile";
 import { usernameExists } from "@/components/header";
 import { revalidatePath } from "next/cache";
+import { Suspense } from "react";
+import LoadingScreen from "@/components/loading-screen";
 import Tabs from "@/components/tabs";
 import Feed from "@/components/feed";
 import { z } from "zod";
@@ -103,7 +105,9 @@ export default async function Page({
       <div className="flex flex-col gap-8 sm:flex-row max-w-screen-lg mx-auto my-8">
         <section className="flex-1 mx-6 flex flex-col">
           <Tabs tabs={["Feed"]} username={profile.username} />
-          <Feed username={profile.username} searchParams={searchParams} />
+          <Suspense key={searchParams?.page} fallback={<LoadingScreen />}>
+            <Feed username={profile.username} searchParams={searchParams} />
+          </Suspense>
         </section>
       </div>
     </main>
