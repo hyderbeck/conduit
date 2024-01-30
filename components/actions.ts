@@ -20,30 +20,32 @@ export async function like(article_id: number, id: string) {
   revalidatePath("/", "layout");
 }
 
+export async function hasAvatar(username: string) {
+  return (
+    await createClient(cookies()).storage.from("avatars").list()
+  ).data!.some((file) => file.name === `${username}.jpg`);
+}
+
 export async function isFollowing(following_id: string, follower_id: string) {
   return (
-    (
-      await createClient(cookies())
-        .schema("conduit")
-        .from("profiles")
-        .select()
-        .eq("user_id", follower_id)
-        .single()
-    ).data!.following?.includes(following_id) || false
-  );
+    await createClient(cookies())
+      .schema("conduit")
+      .from("profiles")
+      .select()
+      .eq("user_id", follower_id)
+      .single()
+  ).data!.following?.includes(following_id);
 }
 
 export async function isFavorite(article_id: number, id: string) {
   return (
-    (
-      await createClient(cookies())
-        .schema("conduit")
-        .from("profiles")
-        .select()
-        .eq("user_id", id)
-        .single()
-    ).data!.favorites?.includes(article_id) || false
-  );
+    await createClient(cookies())
+      .schema("conduit")
+      .from("profiles")
+      .select()
+      .eq("user_id", id)
+      .single()
+  ).data!.favorites?.includes(article_id);
 }
 
 export async function unfollow(following_id: string, follower_id: string) {
@@ -60,10 +62,4 @@ export async function unlike(article_id: number, id: string) {
     id,
   });
   revalidatePath("/", "layout");
-}
-
-export async function hasAvatar(username: string) {
-  return (
-    await createClient(cookies()).storage.from("avatars").list()
-  ).data!.some((file) => file.name === `${username}.jpg`);
 }

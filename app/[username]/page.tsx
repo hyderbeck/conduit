@@ -1,11 +1,12 @@
-import Feed from "@/components/feed";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Profile from "./profile";
 import { usernameExists } from "@/components/header";
-import { z } from "zod";
 import { revalidatePath } from "next/cache";
+import Tabs from "@/components/tabs";
+import Feed from "@/components/feed";
+import { z } from "zod";
 
 async function updateProfile(formData: FormData, currentUsername: string) {
   "use server";
@@ -68,8 +69,10 @@ async function updateProfile(formData: FormData, currentUsername: string) {
 
 export default async function Page({
   params,
+  searchParams,
 }: {
   params: { username: string };
+  searchParams?: { page?: number };
 }) {
   const supabase = createClient(cookies());
 
@@ -97,7 +100,12 @@ export default async function Page({
         userId={user?.id}
         updateProfile={updateProfile}
       />
-      <Feed userId={user?.id} username={profile.username} />
+      <div className="flex flex-col gap-8 sm:flex-row max-w-screen-lg mx-auto my-8">
+        <section className="flex-1 mx-6 flex flex-col">
+          <Tabs tabs={["Feed"]} username={profile.username} />
+          <Feed username={profile.username} searchParams={searchParams} />
+        </section>
+      </div>
     </main>
   );
 }

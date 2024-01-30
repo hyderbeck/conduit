@@ -1,8 +1,8 @@
-import Feed from "@/components/feed";
-import Tabs from "@/components/tabs";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import Tags from "@/components/tags";
+import Tabs from "@/components/tabs";
+import Feed from "@/components/feed";
 import Image from "next/image";
 
 export default async function Page({
@@ -11,6 +11,7 @@ export default async function Page({
   searchParams?: {
     tab?: string;
     tag?: string;
+    page?: number;
   };
 }) {
   const supabase = createClient(cookies());
@@ -76,12 +77,16 @@ export default async function Page({
           </div>
         </div>
       </div>
-      <Tabs tabs={tabs} />
-      <Feed userId={user?.id} searchParams={searchParams} />
-      <section>
-        <h3>Popular Tags</h3>
-        <Tags tags={tags.map((t) => t.tag)} />
-      </section>
+      <div className="flex flex-col gap-8 sm:flex-row max-w-screen-lg mx-auto my-8">
+        <section className="flex-1 mx-6 flex flex-col">
+          <Tabs tabs={tabs} />
+          <Feed searchParams={searchParams} />
+        </section>
+        <section className="bg-stone-100 px-6 py-4 flex flex-col gap-4 h-fit sm:p-4 sm:mr-6 sm:rounded sm:max-w-48">
+          <h3 className="font-bold">Popular Tags</h3>
+          <Tags tags={tags.map((t) => t.tag)} colored />
+        </section>
+      </div>
     </main>
   );
 }

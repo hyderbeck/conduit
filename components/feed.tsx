@@ -62,28 +62,42 @@ async function getProfileFeed(
   ).data;
 }
 
+async function getAuthor(
+  supabase: ReturnType<typeof createClient>,
+  authorId: string
+) {
+  return (
+    await supabase
+      .schema("conduit")
+      .from("profiles")
+      .select()
+      .eq("user_id", authorId)
+      .single()
+  ).data!.username;
+}
+
 export default async function Feed({
-  userId,
-  searchParams,
   username,
+  searchParams,
 }: {
-  userId?: string;
-  searchParams?: {
-    tab?: string;
-    tag?: string;
-    page?: number;
-  };
   username?: string;
+  searchParams?: { tag?: string; tab?: string; page?: number };
 }) {
   const supabase = createClient(cookies());
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
 
   let articles = username
     ? await getProfileFeed(supabase, username)
-    : await getHomeFeed(supabase, userId, searchParams?.tab, searchParams?.tag);
+    : await getHomeFeed(
+        supabase,
+        user?.id,
+        searchParams?.tab,
+        searchParams?.tag
+      );
 
-  const pagesTotal = Math.ceil((articles?.length || 1) / 10);
-
-  if (articles?.length) {
+  if (articles) {
     const start =
       searchParams?.page && searchParams?.page > 1
         ? searchParams?.page * 10
@@ -92,26 +106,17 @@ export default async function Feed({
   }
 
   return (
-    <section>
-      {articles?.length &&
-        articles?.map(async (article) => (
+    <>
+      {!!articles?.length &&
+        articles.map(async (article) => (
           <Preview
             key={article.id}
             article={article}
-            author={
-              (
-                await supabase
-                  .schema("conduit")
-                  .from("profiles")
-                  .select()
-                  .eq("user_id", article.author_id)
-                  .single()
-              ).data!.username
-            }
-            userId={userId}
+            author={await getAuthor(supabase, article.author_id)}
+            userId={user?.id}
           />
         ))}
-      <Pagination pagesTotal={pagesTotal} />
-    </section>
+      <Pagination pagesTotal={Math.ceil((articles?.length || 1) / 10)} />
+    </>
   );
 }
