@@ -16,8 +16,9 @@ export default function Nav({
   username: string;
   logOut: () => Promise<void>;
 }) {
-  const [userMenu, setUserMenu] = useState(false);
+  const [menu, setMenu] = useState(false);
   const [loggingOut, setLoggingOut] = useState(false);
+
   const pathname = usePathname();
   const router = useRouter();
 
@@ -25,25 +26,21 @@ export default function Nav({
     <nav>
       <ul className="flex items-center gap-x-6 relative">
         <li>
-          <Link
-            aria-label="new article"
-            href="/new"
-            className="active:shadow-inner active:shadow-stone-200 bg-stone-50 flex items-center gap-x-2"
-          >
+          <Link aria-label="new article" href="/new">
             <PencilSquareIcon className="w-5 h-5" />
           </Link>
         </li>
         <li id="menu" className="flex flex-col items-center">
           <div className="flex items-center gap-x-4">
-            <Avatar username={username} width={48} priority isUser />
+            <Avatar username={username} width={48} priority />
             <button
               onClick={() => {
-                setUserMenu(!userMenu);
+                setMenu(!menu);
                 document.body.addEventListener("click", (e) => {
                   if (
                     !document.getElementById("menu")?.contains(e.target as Node)
                   )
-                    setUserMenu(false);
+                    setMenu(false);
                 });
               }}
               className="font-bold"
@@ -52,10 +49,10 @@ export default function Nav({
               {username}
             </button>
           </div>
-          {userMenu && (
+          {menu && (
             <ul className="absolute top-20 w-full right-0 rounded px-4 py-2 *:py-2 bg-stone-50 z-10">
               <li>
-                <Link href={`/${username}`} onClick={() => setUserMenu(false)}>
+                <Link href={`/${username}`} onClick={() => setMenu(false)}>
                   Profile
                 </Link>
               </li>

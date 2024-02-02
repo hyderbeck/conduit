@@ -1,11 +1,12 @@
+import clsx from "clsx";
+
 export default function Spinner({ screen }: { screen?: boolean }) {
   return (
     <svg
-      className={
-        screen
-          ? "w-4 h-4 text-emerald-300 animate-spin"
-          : "w-3 h-3 text-emerald-300 animate-spin"
-      }
+      className={clsx(
+        screen ? "w-4 h-4" : "w-3 h-3",
+        "text-emerald-300 animate-spin"
+      )}
       xmlns="http://www.w3.org/2000/svg"
       fill="none"
       viewBox="0 0 24 24"

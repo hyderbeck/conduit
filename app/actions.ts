@@ -21,10 +21,11 @@ export async function updateArticle(
     title: z.string().max(100).optional(),
   });
 
-  const title = String(formData.get("title")).trim();
-  const slug = encodeURIComponent(title.toLowerCase().split(" ").join("-"));
+  const title = (formData.get("title") as string).trim();
 
   if (!ArticleSchema.safeParse({ title }).success) return;
+
+  const slug = encodeURIComponent(title.toLowerCase().split(" ").join("-"));
 
   const articleExists = (
     await supabase
@@ -39,7 +40,7 @@ export async function updateArticle(
   if (articleExists && articleExists.id !== currentArticleId)
     return "You can't have two articles with the same title";
 
-  const body = String(formData.get("body")).trim();
+  const body = (formData.get("body") as string).trim();
 
   if (isNew) {
     await supabase.schema("conduit").from("articles").insert({
@@ -63,5 +64,5 @@ export async function updateArticle(
   }
 
   revalidatePath("/", "layout");
-  return { slug: slug };
+  return slug;
 }

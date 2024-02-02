@@ -48,7 +48,7 @@ export default async function Page({
     <main>
       <div className="min-h-80 flex items-center justify-center bg-emerald-300 bg-hero">
         <div className="flex flex-col gap-y-1">
-          <h2 className="text-stone-50 bg-stone-950 px-1 font-black text-7xl mt-8">
+          <h2 className="text-stone-50 bg-stone-950 px-2 py-1 font-black text-7xl mt-8 rounded">
             conduit
           </h2>
           <div className="flex gap-x-1 ml-auto">

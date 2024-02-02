@@ -1,8 +1,14 @@
 import Spinner from "@/components/spinner";
+import clsx from "clsx";
 
-export default function LoadingScreen() {
+export default function LoadingScreen({ full }: { full?: boolean }) {
   return (
-    <div className="flex-1 flex items-center justify-center min-h-36 sm:min-h-0">
+    <div
+      className={clsx(
+        "flex items-center justify-center",
+        full ? "flex-1" : "mt-16 mb-8"
+      )}
+    >
       <Spinner screen />
     </div>
   );

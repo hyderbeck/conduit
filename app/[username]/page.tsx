@@ -2,13 +2,14 @@ import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
 import { notFound } from "next/navigation";
 import Profile from "./profile";
-import { usernameExists } from "@/components/header";
+import { usernameExists } from "@/utils";
 import { revalidatePath } from "next/cache";
 import { Suspense } from "react";
 import LoadingScreen from "@/components/loading-screen";
 import Tabs from "@/components/tabs";
 import Feed from "@/components/feed";
 import { z } from "zod";
+import { getAvatar } from "@/components/actions";
 
 async function updateProfile(formData: FormData, currentUsername: string) {
   "use server";
@@ -25,7 +26,7 @@ async function updateProfile(formData: FormData, currentUsername: string) {
     bio: z.string().max(160).optional(),
   });
 
-  const username = String(formData.get("username")).trim();
+  const username = (formData.get("username") as string).trim();
 
   if (!Profile.safeParse({ username }).success) return;
 
@@ -45,16 +46,15 @@ async function updateProfile(formData: FormData, currentUsername: string) {
     if (avatar.size > 5000000) return "Avatar should be less than 5 MB";
     await supabase.storage
       .from("avatars")
-      .upload(`${username}.jpg`, await avatar.arrayBuffer(), {
+      .upload(`${username}${Math.random()}.jpg`, await avatar.arrayBuffer(), {
         contentType: "image/jpg",
-        cacheControl: "60",
         upsert: true,
       });
   }
 
   await supabase.storage
     .from("avatars")
-    .move(`${currentUsername}.jpg`, `${username}.jpg`);
+    .move((await getAvatar(currentUsername)) || "", `${username}${Math.random()}.jpg`);
 
   await supabase
     .schema("conduit")

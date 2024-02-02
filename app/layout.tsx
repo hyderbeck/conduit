@@ -2,7 +2,13 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Header from "@/components/header";
 import Footer from "@/components/footer";
-import { roboto } from "./fonts";
+import { Roboto } from "next/font/google";
+
+export const roboto = Roboto({
+  subsets: ["latin"],
+  weight: ["400", "700", "900"],
+  style: ["normal", "italic"],
+});
 
 export const metadata: Metadata = {
   title: "Conduit",

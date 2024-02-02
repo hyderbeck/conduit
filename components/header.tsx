@@ -1,24 +1,11 @@
 import Link from "next/link";
+import Nav from "./nav";
 import Login from "./login";
 import { createClient } from "@/supabase";
 import { cookies } from "next/headers";
-import Nav from "./nav";
-import { revalidatePath } from "next/cache";
 import { z } from "zod";
-
-export async function usernameExists(
-  supabase: ReturnType<typeof createClient>,
-  username: string
-) {
-  return (
-    await supabase
-      .schema("conduit")
-      .from("profiles")
-      .select()
-      .eq("username", username)
-      .single()
-  ).data;
-}
+import { usernameExists } from "@/utils";
+import { revalidatePath } from "next/cache";
 
 async function signUp(formData: FormData) {
   "use server";
@@ -52,12 +39,12 @@ async function signUp(formData: FormData) {
   });
 
   if (!error) {
-    revalidatePath("/", "layout");
     await supabase.schema("conduit").from("profiles").insert({
       username,
       email,
       user_id: user!.id,
     });
+    revalidatePath("/", "layout");
     return "signed up";
   }
 
@@ -68,15 +55,8 @@ async function signUp(formData: FormData) {
 async function logIn(formData: FormData) {
   "use server";
 
-  const User = z.object({
-    email: z.string().email(),
-    password: z.string().min(6),
-  });
-
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
-  if (!User.safeParse({ email, password }).success) return;
 
   const { error } = await createClient(cookies()).auth.signInWithPassword({
     email,
@@ -88,19 +68,20 @@ async function logIn(formData: FormData) {
     return "logged in";
   }
 
-  if (error && error.message === "Invalid login credentials")
+  if (error.message === "Invalid login credentials")
     return "Invalid credentials";
 }
 
 async function logOut() {
   "use server";
 
-  revalidatePath("/", "layout");
   await createClient(cookies()).auth.signOut();
+  revalidatePath("/", "layout");
 }
 
 export default async function Header() {
   const supabase = createClient(cookies());
+
   const {
     data: { user },
   } = await supabase.auth.getUser();

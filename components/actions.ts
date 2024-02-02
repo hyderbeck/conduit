@@ -20,10 +20,10 @@ export async function like(article_id: number, id: string) {
   revalidatePath("/", "layout");
 }
 
-export async function hasAvatar(username: string) {
+export async function getAvatar(username: string) {
   return (
     await createClient(cookies()).storage.from("avatars").list()
-  ).data!.some((file) => file.name === `${username}.jpg`);
+  ).data!.find((avatar) => avatar.name.includes(username))?.name;
 }
 
 export async function isFollowing(following_id: string, follower_id: string) {

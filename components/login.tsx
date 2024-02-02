@@ -4,39 +4,7 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { Button } from "./buttons";
 import Spinner from "./spinner";
-import clsx from "clsx";
-
-export function InputUsername({
-  username,
-  error,
-  className,
-}: {
-  username?: string;
-  error?: string;
-  className?: string;
-}) {
-  return (
-    <input
-      type="text"
-      placeholder="Username"
-      aria-label="username"
-      name="username"
-      required
-      minLength={3}
-      maxLength={20}
-      pattern="[a-zA-Z0-9]+"
-      title="Username can only contain letters and numbers"
-      defaultValue={username}
-      spellCheck={false}
-      autoComplete="on"
-      className={clsx(
-        "px-4 py-2 border border-stone-100 rounded placeholder:text-stone-400 w-[20ch]",
-        error === "Username already taken" && "!border-red-500",
-        className
-      )}
-    />
-  );
-}
+import { Username, Email, Password } from "./inputs";
 
 export default function Login({
   signUp,
@@ -45,22 +13,15 @@ export default function Login({
   signUp: (formData: FormData) => Promise<undefined | string>;
   logIn: (formData: FormData) => Promise<undefined | string>;
 }) {
+  const [login, setLogin] = useState(false);
   const [signingUp, setSigningUp] = useState(false);
-  const [loading, setLoading] = useState(false);
   const prompt = signingUp ? "Sign Up" : "Log In";
-  const buttonPrompt = signingUp
-    ? loading
-      ? "Signing Up..."
-      : prompt
-    : loading
-    ? "Logging In..."
-    : prompt;
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
   const router = useRouter();
   const pathname = usePathname();
-
   const searchParams = useSearchParams();
-  const [login, setLogin] = useState(false);
 
   useEffect(() => {
     setLogin(searchParams.has("login"));
@@ -69,22 +30,18 @@ export default function Login({
   return (
     <>
       <Button
+        color="emerald"
         onClick={() => {
           setLogin(true);
           document.body.style.overflow = "hidden";
         }}
-        text="Log In"
-      />
+      >
+        Log In
+      </Button>
       {login && (
         <section
           onClick={(e) => {
             if (e.target === e.currentTarget) {
-              setLogin(false);
-              document.body.style.overflow = "auto";
-            }
-          }}
-          onKeyDown={(e) => {
-            if (e.key === "Escape") {
               setLogin(false);
               document.body.style.overflow = "auto";
             }
@@ -97,7 +54,6 @@ export default function Login({
               <button
                 onClick={() => {
                   setError("");
-                  loading && setLoading(!loading);
                   setSigningUp(!signingUp);
                 }}
                 className="text-emerald-300 text-sm"
@@ -110,71 +66,56 @@ export default function Login({
               onSubmit={() => {
                 setError("");
                 setLoading(true);
-                document.body.style.overflow = "auto";
               }}
               action={async (formData) => {
-                const error = signingUp
+                const message = signingUp
                   ? await signUp(formData)
                   : await logIn(formData);
-                if (error === "signed up") {
+                if (message === "signed up") {
+                  document.body.style.overflow = "auto";
                   router.push(`/${formData.get("username")}`);
-                } else if (error === "logged in") {
+                } else if (message === "logged in") {
+                  document.body.style.overflow = "auto";
                   router.replace(pathname);
                 } else {
-                  document.body.style.overflow = "hidden";
                   setLoading(false);
-                  error && setError(error);
+                  message && setError(message);
                 }
               }}
               className="flex flex-col gap-y-4 items-center"
             >
               <div className="flex flex-col gap-y-2 *:w-full">
-                {signingUp && <InputUsername error={error} />}
-                {error === "Username already taken" && (
-                  <p className="text-red-500 text-sm">{error}</p>
+                {signingUp && (
+                  <Username
+                    error={
+                      error === "Username already taken" ? error : undefined
+                    }
+                  />
                 )}
-                <input
-                  type="email"
-                  placeholder="Email"
-                  aria-label="email"
-                  name="email"
-                  required
-                  autoComplete="on"
-                  className={clsx(
-                    "px-4 py-2 border border-stone-100 rounded placeholder:text-stone-400",
+                <Email
+                  error={
                     [
                       "Invalid credentials",
                       "Email already registered",
-                    ].includes(error) && "!border-red-500"
-                  )}
+                    ].includes(error)
+                      ? error
+                      : undefined
+                  }
                 />
-                {error === "Email already registered" && (
-                  <p className="text-red-500 text-sm">{error}</p>
-                )}
-                <input
-                  type="password"
-                  placeholder="Password"
-                  aria-label="password"
-                  name="password"
-                  required
-                  minLength={signingUp ? 6 : undefined}
-                  maxLength={signingUp ? 20 : undefined}
-                  autoComplete="on"
-                  className={clsx(
-                    "px-4 py-2 border border-stone-100 rounded placeholder:text-stone-400",
-                    error === "Invalid credentials" && "!border-red-500"
-                  )}
+                <Password
+                  signingUp={signingUp}
+                  error={error === "Invalid credentials" ? error : undefined}
                 />
-                {error === "Invalid credentials" && (
-                  <p className="text-red-500 text-sm">{error}</p>
-                )}
               </div>
-              <Button
-                text={buttonPrompt}
-                className="flex gap-x-2 items-center"
-                disabled={loading}
-              >
+              <Button color="emerald" disabled={loading}>
                 {loading && <Spinner />}
+                {signingUp
+                  ? loading
+                    ? "Signing Up..."
+                    : prompt
+                  : loading
+                  ? "Logging In..."
+                  : prompt}
               </Button>
             </form>
           </div>

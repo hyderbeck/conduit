@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ForwardedRef, forwardRef, useEffect, useRef, useState } from "react";
 import { PlusIcon, MinusIcon } from "@heroicons/react/16/solid";
+import clsx from "clsx";
 
 function Tag(
   {
@@ -66,9 +67,10 @@ function Tag(
         <Link
           href={`/?tag=${tag.toLowerCase()}`}
           scroll={false}
-          className={`border px-2 py-0.25 rounded-full text-sm ${
-            !color ? "border-stone-200 text-stone-400" : ""
-          }`}
+          className={clsx(
+            "border px-2 py-0.25 rounded-full text-sm",
+            !color && "border-stone-200 text-stone-400"
+          )}
           style={
             color
               ? {
